@@ -78,6 +78,7 @@ func ParseFileType(s string) (FileType, error) {
 			FileTypeQ4_K_S,
 			FileTypeQ4_K_M,
 			FileTypeQ8_0,
+			fileTypeNVFP4,
 			// fsggml.FileTypeBF16, // TODO
 		}
 		strs := make([]string, len(supportedFileTypes))

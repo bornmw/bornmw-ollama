@@ -1599,6 +1599,57 @@ func TestCreateHandlerDraftRequiresExperimental(t *testing.T) {
 	}
 }
 
+func TestCreateHandlerNvfp4Quantize(t *testing.T) {
+	created := false
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/create" {
+			req := api.CreateRequest{}
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			created = req.Quantize == "nvfp4"
+			responses := []api.ProgressResponse{
+				{Status: "success"},
+			}
+			for _, resp := range responses {
+				if err := json.NewEncoder(w).Encode(resp); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				w.(http.Flusher).Flush()
+			}
+			return
+		}
+		t.Errorf("unexpected request to %s", r.URL.Path)
+		http.Error(w, "not found", http.StatusNotFound)
+	}))
+	defer mockServer.Close()
+
+	os.Setenv("OLLAMA_HOST", mockServer.URL)
+	defer os.Unsetenv("OLLAMA_HOST")
+
+	dir := t.TempDir()
+	modelfile := filepath.Join(dir, "Modelfile")
+	if err := os.WriteFile(modelfile, []byte("FROM foo\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := &cobra.Command{}
+	cmd.Flags().Bool("experimental", false, "")
+	cmd.Flags().String("quantize", "nvfp4", "")
+	cmd.Flags().String("file", modelfile, "")
+	cmd.SetContext(t.Context())
+
+	err := CreateHandler(cmd, []string{"test-model"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !created {
+		t.Fatal("expected quantize to be nvfp4")
+	}
+}
+
 func TestResolveExperimentalLocalModelDir(t *testing.T) {
 	dir := t.TempDir()
 	modelfile := filepath.Join(dir, "Modelfile")
