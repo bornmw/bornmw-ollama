@@ -499,6 +499,8 @@ func (t TensorType) TypeSize() uint64 {
 		return 2
 	case 4, TensorTypeMXFP4:
 		return 1 + blockSize/2
+	case tensorTypeNVFP4:
+		return 144
 	default:
 		return 0
 	}

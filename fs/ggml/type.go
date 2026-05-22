@@ -48,6 +48,7 @@ const (
 	fileTypeQ4_0_8_8 // unused by GGML
 	fileTypeTQ1_0
 	fileTypeTQ2_0
+	fileTypeNVFP4
 
 	FileTypeUnknown = 1024
 )
@@ -68,6 +69,8 @@ func ParseFileType(s string) (FileType, error) {
 		return FileTypeQ4_K_M, nil
 	case "BF16":
 		return FileTypeBF16, nil
+	case "NVFP4":
+		return fileTypeNVFP4, nil
 	default:
 		supportedFileTypes := []FileType{
 			FileTypeF32,
@@ -99,6 +102,8 @@ func (t FileType) String() string {
 		return "Q4_1"
 	case fileTypeMXFP4:
 		return "MXFP4"
+	case fileTypeNVFP4:
+		return "NVFP4"
 	case FileTypeQ8_0:
 		return "Q8_0"
 	case fileTypeQ5_0:
@@ -176,6 +181,8 @@ func (ftype FileType) ToTensorType() TensorType {
 		return TensorTypeBF16
 	case fileTypeMXFP4:
 		return TensorTypeMXFP4
+	case fileTypeNVFP4:
+		return tensorTypeNVFP4
 	default:
 		slog.Warn("unsupported file type", "type", ftype)
 		return 0 // F32
@@ -227,6 +234,7 @@ const (
 	tensorTypeIQ4_NL_4_8 // unused by GGML
 	tensorTypeIQ4_NL_8_8 // unused by GGML
 	TensorTypeMXFP4
+	tensorTypeNVFP4
 )
 
 // ParseTensorType parses the provided GGUF tensor type
@@ -267,6 +275,8 @@ func ParseTensorType(s string) (TensorType, error) {
 		return TensorTypeBF16, nil
 	case "MXFP4":
 		return TensorTypeMXFP4, nil
+	case "NVFP4":
+		return tensorTypeNVFP4, nil
 	default:
 		return 0, fmt.Errorf("unsupported quantization type %s", s)
 	}
@@ -321,6 +331,8 @@ func (t TensorType) String() string {
 		return "BF16"
 	case 4, TensorTypeMXFP4:
 		return "MXFP4"
+	case tensorTypeNVFP4:
+		return "NVFP4"
 	default:
 		return "unknown"
 	}

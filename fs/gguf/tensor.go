@@ -97,6 +97,8 @@ const (
 	tensorTypeIQ4_NL_4_4
 	tensorTypeIQ4_NL_4_8
 	tensorTypeIQ4_NL_8_8
+
+	TensorTypeNVFP4
 )
 
 func (tt TensorType) NumBytes() float64 {
@@ -163,6 +165,8 @@ func (tt TensorType) typeSize() int64 {
 		return tt.blockSize()/8 + tt.blockSize()/16 + tt.blockSize()/32
 	case TensorTypeBF16:
 		return 2
+	case TensorTypeNVFP4:
+		return 144
 	default:
 		return 0
 	}
@@ -272,6 +276,8 @@ func (tt TensorType) String() string {
 		return "iq4_nl_4_8"
 	case tensorTypeIQ4_NL_8_8:
 		return "iq4_nl_8_8"
+	case TensorTypeNVFP4:
+		return "nvfp4"
 	default:
 		return "unknown"
 	}

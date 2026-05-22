@@ -226,6 +226,18 @@ func TestRead(t *testing.T) {
 	}
 }
 
+func TestNvfp4TensorType(t *testing.T) {
+	// Verify NVFP4 tensor type constants
+	ty := gguf.TensorTypeNVFP4
+	if got := ty.String(); got != "nvfp4" {
+		t.Errorf("String() = %q, want %q", got, "nvfp4")
+	}
+	// blockSize=256, typeSize=144 => NumBytes = 144/256 = 0.5625
+	if got := ty.NumBytes(); got != 0.5625 {
+		t.Errorf("NumBytes() = %f, want 0.5625", got)
+	}
+}
+
 func BenchmarkRead(b *testing.B) {
 	b.ReportAllocs()
 
